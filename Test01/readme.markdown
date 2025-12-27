@@ -8,7 +8,7 @@
 3. 本次训练集采用`COCO`格式进行标注。
 
 ### 图像来源
-1. 我们的数据来源于[https://search.asf.alaska.edu/]网站下载的`Sentinel 1`卫星`SLC`版本的原始数据；
+1. 我们的数据来源于 [https://search.asf.alaska.edu/] 网站下载的`Sentinel 1`卫星`SLC`版本的原始数据；
 2. 在数据处理的过程中，我们使用`SNAP`软件提供的一些常规操作，具体可以参见我们的数据集处理过程部分（第1.2章）。
 3. 在最后的噪声处理中，我们采用了包括但不限于以下的表达式，对我们的`VV`极化数据进行最后的增强：
    （1）简单线性增强；
@@ -90,4 +90,5 @@
     --resume 'write your own path of the reference model'
 
     ```
+
 
