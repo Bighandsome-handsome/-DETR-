@@ -1,4 +1,4 @@
-# -DETR-
+# SAR SHIPDETECTION PROJECT
 [![Project Status](https://img.shields.io/badge/Project-National_Innovation_Program-blue)](https://github.com/your-username/Sentinel-ShipDet)
 [![Framework](https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch)](https://pytorch.org/)
 [![Backend](https://img.shields.io/badge/Flask-lightgrey?logo=flask)](https://flask.palletsprojects.com/)
