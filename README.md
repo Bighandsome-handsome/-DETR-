@@ -1,5 +1,11 @@
 # -DETR-
-这是Deformable-DETR模型，一个更加牛逼的DETR模型，用于SRTP。
+[![Project Status](https://img.shields.io/badge/Project-National_Innovation_Program-blue)](https://github.com/your-username/Sentinel-ShipDet)
+[![Framework](https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch)](https://pytorch.org/)
+[![Backend](https://img.shields.io/badge/Flask-lightgrey?logo=flask)](https://flask.palletsprojects.com/)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+> **国家级本科生创新创业训练计划项目成果** > **项目名称**：基于 Sentinel-1 遥感卫星的海面目标检测与识别  
+> **核心架构**：Deformable DETR (Transformer) + YOLOv8 (CNN) + Flask Web Stack
 ### 项目进度 (Project Milestones)
 #### 第一阶段：模型验证与基准测试 (已于 2025年12月15日 完成)
 - [1] **数据集训练**：选取 HRSID 官方训练集，在 DETR 与 Deformable DETR 上完成深度训练。
