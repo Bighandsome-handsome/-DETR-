@@ -46,7 +46,6 @@
 至此，我们已完成数据集的构建工作，数据集可以在本项目的Test01中进行下载和查看。
 
 ## 2. 关于模型`Deformable DETR`
-# Deformable-DETR for Ship Detection (SRTP Phase II)
 
 本项目是国家级大创项目《基于 Sentinel-1 遥感卫星的海面目标检测与识别》的核心子项目。我们专注于利用 **Deformable DETR** (可变形 Transformer) 解决 SAR 影像中舰船目标检测的挑战。
 
