@@ -1,4 +1,4 @@
-# 🚢 Sentinel-ShipDet: 基于 Deformable DETR 的海面目标检测与解译平台
+# 🚢 基于 Deformable DETR 的海面目标检测与解译平台
 
 [![Project Status](https://img.shields.io/badge/Project-National_Innovation_Program-blue)](https://github.com/your-username/Sentinel-ShipDet)
 [![Framework](https://img.shields.io/badge/PyTorch-ee4c2c?logo=pytorch)](https://pytorch.org/)
@@ -27,16 +27,6 @@
   - **右侧**：支持图像拖拽上传、`FileReader` 实时预览，并提供 YOLO 与 DETR 模型的无感切换。
 - **异步调度架构**：后端采用 Flask + `subprocess` 松耦合策略，通过 Fetch API 实现无刷新检测，确保了推理过程的稳定与高效。
 
-## 📅 项目阶段回顾
-- **Phase I (基准建立)**：完成 HRSID 数据集训练，实现 YOLOv8 与 Deformable DETR 的横向测评。
-- **Phase II (结构优化 - 进行中)**：针对多极化（VV/VH）数据重构数据集，进一步魔改 Transformer 采样策略以提升抗干扰能力。
-
-## 📊 性能表现 (Benchmark)
-| 架构类型 | 代表模型 | mAP@0.5 | 推理速度 (FPS) | 适用场景 |
-| :--- | :--- | :--- | :--- | :--- |
-| **Transformer** | **Deformable DETR** | **0.89+** | ~15 | 高精度港口解译 |
-| **CNN** | **YOLOv8-s** | 0.87 | **~60+** | 实时海上巡检 |
-
 ## 🛠️ 快速上手
 1. **环境准备**：
    ```bash
@@ -45,6 +35,8 @@
    ```
 2. **快速上手**：
    ```python
+   # 请先确认你已经下载了我们训练好的`Deformable DETR`模型权重
+   # 本网站还支持`YOLOV8`模型，我们后续会公开相应的模型权重文件
    python server.py
    # 访问地址：http://localhost:5000
    ```
