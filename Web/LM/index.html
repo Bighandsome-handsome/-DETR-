@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LM Ship</title>
+    <script src="../libs/tailwindcss.js"></script>
+
+    <link rel="stylesheet" href="../libs/katex.min.css">
+    <script src="../libs/katex.min.js"></script>
+    <script src="../libs/auto-render.min.js" onload="loadAndRenderMarkdown();"></script>
+
+    <style>
+        :root {
+            font-family: 'Inter', sans-serif;
+            color: #e5e7eb;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1f2937 0%, #111827 50%, #0d0c11 100%);
+        }
+
+        .frosted-panel {
+            backdrop-filter: blur(12px) saturate(150%);
+            -webkit-backdrop-filter: blur(12px) saturate(150%);
+            background-color: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        #html-output h1 { font-size: 1.875rem; color: #d1d5db; border-bottom: 2px solid #60a5fa; padding-bottom: 0.5rem; margin-top: 1.5rem; font-weight: 700; }
+        #html-output h2 { font-size: 1.5rem; color: #d1d5db; border-bottom: 2px solid #3b82f670; padding-bottom: 0.5rem; margin-top: 1.5rem; font-weight: 700; }
+        #html-output h3 { font-size: 1.25rem; color: #d1d5db; border-bottom: 1px solid #3b82f650; padding-bottom: 0.5rem; margin-top: 1.5rem; font-weight: 700; }
+        #html-output p, #html-output li, #html-output a { color: #e5e7eb; }
+        #html-output pre { background-color: rgba(0, 0, 0, 0.4); color: #f3f4f6; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; }
+        #html-output p { margin-bottom: 1rem; }
+        #html-output ul, #html-output ol { margin-left: 1.5rem; margin-bottom: 1rem; list-style-position: inside; }
+        #html-output ul { list-style-type: disc; }
+
+        /* Hide scrollbar for the markdown viewer but keep it scrollable */
+        #html-output {
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE 10+ */
+        }
+        #html-output::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+            display: none; /* Chrome, Safari, Edge */
+        }
+
+        .katex {
+            color: #e5e7eb;
+        }
+    </style>
+    <script src="../libs/marked.umd.min.js"></script>
+</head>
+
+<!-- Body: 垂直弹性容器，锁死全屏 -->
+
+<body class="w-screen h-screen overflow-hidden flex flex-col p-4 md:p-8 text-gray-100">
+
+    <!-- 主容器: 占据剩余空间，三列 Grid -->
+    <div class="flex-1 w-full min-h-0 grid grid-cols-3 gap-4">
+
+        <!-- 左侧整列 (Markdown Viewer) -->
+        <div class="col-span-1 flex flex-col h-full gap-4 min-h-0">
+
+            <!-- 标题区域 -->
+            <div class="flex-none flex items-center justify-center py-2">
+                <h1 class="text-3xl font-extrabold text-blue-300 tracking-wider">LM Ship</h1>
+            </div>
+
+            <!-- Markdown 内容区域 -->
+            <div id="html-output" class="flex-1 p-6 rounded-xl shadow-2xl overflow-y-auto frosted-panel">
+                <!-- Markdown 内容 -->
+            </div>
+        </div>
+
+        <!-- 右侧整列 (Interaction Panels) -->
+        <div class="col-span-2 flex flex-col gap-4 h-full min-h-0">
+
+            <!-- 上部分：图片上传/控制区域 -->
+            <div class="flex-1 p-6 rounded-xl shadow-2xl frosted-panel min-h-0 flex flex-col">
+                <div class="flex-none flex gap-4 mb-4">
+                    <h2 class="text-xl font-bold text-blue-400">上传图片</h2>
+                    <select id="model-select" class="px-3 py-1 bg-gray-700 text-white rounded border border-gray-600 text-sm font-semibold">
+                        <option value="yolo">YOLO</option>
+                        <option value="detr">DETR</option>
+                    </select>
+                </div>
+
+                <!-- 核心改动：左右结构容器 -->
+                <div class="flex-1 flex gap-4 min-h-0">
+
+                    <!-- 左侧: 图片显示区域 (flex-1 占据大部分空间) -->
+                    <div id="image-display-area"
+                        class="flex-1 border-2 border-dashed border-gray-500 rounded-lg flex items-center justify-center relative overflow-hidden transition-all duration-300">
+                        <!-- 占位符 P 标签 -->
+                        <p id="image-placeholder" class="text-gray-400 absolute transition-opacity duration-300">上传后的图像将显示在这里</p>
+                        <!-- 图片显示容器，一开始隐藏 -->
+                        <img id="uploaded-image" src="" alt="Uploaded Image"
+                            class="hidden w-full h-full object-contain p-2">
+                    </div>
+
+                    <!-- 右侧: 按钮控制区域 (w-40 固定宽度) -->
+                    <div class="flex-none w-40 flex flex-col gap-4">
+
+                        <!-- 1. 上传图片按钮 -->
+                        <button id="upload-btn" class="w-full py-3 px-4 rounded-lg 
+                                 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 
+                                 text-white font-semibold transition duration-200 
+                                 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]">
+                            上传图片
+                        </button>
+                        <!-- 限制只接受 .jpg .jpeg .png 文件 -->
+                        <input type="file" id="file-input" accept=".jpg,.jpeg,.png" class="hidden">
+
+                        <!-- 2. 开始推理按钮 (默认禁用) -->
+                        <button id="infer-btn" disabled class="w-full py-3 px-4 rounded-lg 
+                                 bg-gray-700 text-gray-400 font-semibold shadow-inner 
+                                 cursor-not-allowed border border-gray-600">
+                            开始推理
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 下部分：检测结果 -->
+            <div class="flex-1 p-6 rounded-xl shadow-2xl frosted-panel min-h-0 flex flex-col">
+                <h2 class="text-xl font-bold text-blue-400 mb-4 flex-none">检测结果</h2>
+                <div id="result-output"
+                    class="flex-1 overflow-y-auto flex items-center justify-center text-sm text-gray-300">
+                    <!-- 结果输出区域 -->
+                    <p class="text-gray-400 text-center">按下“开始推理”后，这里会显示生成的图片。</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="../libs/marked.umd.min.js"></script>
+    <script>
+        const htmlOutput = document.getElementById('html-output');
+        const fileInput = document.getElementById('file-input');
+        const uploadBtn = document.getElementById('upload-btn');
+        const inferBtn = document.getElementById('infer-btn');
+        const uploadedImage = document.getElementById('uploaded-image');
+        const imagePlaceholder = document.getElementById('image-placeholder');
+        const resultOutput = document.getElementById('result-output');
+        const imageDisplayArea = document.getElementById('image-display-area');
+
+        let fileSelected = false;
+
+        function setButtonState(enabled) {
+            if (enabled) {
+                inferBtn.disabled = false;
+                inferBtn.classList.remove('bg-gray-700', 'text-gray-400', 'shadow-inner', 'cursor-not-allowed', 'border-gray-600');
+                inferBtn.classList.add('bg-green-600', 'hover:bg-green-700', 'active:bg-green-800', 'text-white', 'shadow-lg');
+            } else {
+                inferBtn.disabled = true;
+                inferBtn.classList.remove('bg-green-600', 'hover:bg-green-700', 'active:bg-green-800', 'text-white', 'shadow-lg');
+                inferBtn.classList.add('bg-gray-700', 'text-gray-400', 'shadow-inner', 'cursor-not-allowed', 'border', 'border-gray-600');
+            }
+        }
+
+        async function uploadFile(file) {
+            resultOutput.innerHTML = '<p class="text-yellow-500 text-center">上传中...</p>';
+            setButtonState(false);
+
+            const formData = new FormData();
+            formData.append('file', file, 'input.jpg');
+
+            try {
+                const response = await fetch('/upload', { method: 'POST', body: formData });
+                if (response.ok) {
+                    fileSelected = true;
+                    setButtonState(true);
+                    resultOutput.innerHTML = '<p class="text-gray-400 text-center">✅ 上传成功，可开始推理</p>';
+                } else {
+                    throw new Error('Upload failed');
+                }
+            } catch (error) {
+                resultOutput.innerHTML = `<div class="p-4 bg-red-800/50 border border-red-500 text-red-200 rounded-lg"><p>上传失败：${error.message}</p></div>`;
+                fileSelected = false;
+                setButtonState(false);
+            }
+        }
+
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (!file.type.match('image/(jpeg|png)')) {
+                resultOutput.innerHTML = '<div class="p-4 bg-red-800/50 border border-red-500 text-red-200 rounded-lg"><p>仅支持 JPG 和 PNG 格式</p></div>';
+                setButtonState(false);
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                uploadedImage.src = e.target.result;
+                uploadedImage.classList.remove('hidden');
+                imagePlaceholder.classList.add('opacity-0');
+                setTimeout(() => imagePlaceholder.classList.add('hidden'), 300);
+                imageDisplayArea.classList.remove('border-dashed', 'border-gray-500');
+                imageDisplayArea.classList.add('border-solid', 'border-blue-500');
+                uploadFile(file);
+            };
+            reader.readAsDataURL(file);
+            e.target.value = '';
+        });
+
+        uploadBtn.addEventListener('click', () => fileInput.click());
+
+        inferBtn.addEventListener('click', async () => {
+            if (!fileSelected) {
+                resultOutput.innerHTML = '<div class="p-4 bg-red-800/50"><p>请先上传图片</p></div>';
+                return;
+            }
+
+            const model = document.getElementById('model-select').value;
+            resultOutput.innerHTML = '<div class="p-4 bg-blue-900/50 text-blue-300 rounded-lg"><p class="font-bold">推理中...</p></div>';
+            setButtonState(false);
+
+            try {
+                const response = await fetch('/infer', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ model })
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    const resultFile = model === 'yolo' ? 'input.jpg' : 'result.png';
+                    const imageUrl = `/results/${resultFile}?t=${Date.now()}`;
+                    resultOutput.innerHTML = `
+                        <div class="flex flex-col items-center justify-center p-4 bg-gray-900 rounded-lg h-full w-full">
+                            <p class="text-green-400 font-bold mb-4">✅ ${model.toUpperCase()} 推理完成</p>
+                            <div class="flex-1 w-full flex items-center justify-center overflow-hidden border-2 border-green-500 rounded-lg p-2 bg-gray-800">
+                                <img src="${imageUrl}" alt="结果" class="max-w-full max-h-full object-contain" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22%3E%3Crect fill=%22%23333%22 width=%22400%22 height=%22300%22/%3E%3C/svg%3E';">
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    resultOutput.innerHTML = `<div class="p-4 bg-red-800/50 border border-red-500 text-red-200 rounded-lg"><p>推理失败：${data.error || '未知错误'}</p></div>`;
+                }
+            } catch (error) {
+                resultOutput.innerHTML = `<div class="p-4 bg-red-800/50 border border-red-500 text-red-200 rounded-lg"><p>错误：${error.message}</p></div>`;
+            }
+            setButtonState(true);
+        });
+
+        async function loadMarkdown() {
+            htmlOutput.innerHTML = '<p class="text-center text-gray-400 py-10">加载中...</p>';
+            try {
+                const response = await fetch('files/README.md');
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const mdText = await response.text();
+                htmlOutput.innerHTML = marked.parse(mdText);
+                renderMathInElement(htmlOutput, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "$", right: "$", display: false },
+                    ],
+                    throwOnError: false
+                });
+            } catch (error) {
+                htmlOutput.innerHTML = `<div class="p-6 bg-red-800/50 border border-red-500 text-red-200 rounded-lg"><h2 class="font-bold text-xl mb-2">加载失败</h2><p>${error.message}</p></div>`;
+            }
+        }
+
+        window.addEventListener('load', loadMarkdown);
+    </script>
+</body>
+
+</html>

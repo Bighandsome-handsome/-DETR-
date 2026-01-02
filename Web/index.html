@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LM Ship</title>
+    <script src="./libs/tailwindcss.js"></script>
+    <style>
+        body {
+            background-color: #0d0d1d;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+        }
+
+        @keyframes flow {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(100px, -50px) scale(1.1); }
+            66% { transform: translate(-150px, 100px) scale(0.9); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
+        .gradient-blob {
+            position: absolute;
+            width: 800px;
+            height: 800px;
+            border-radius: 50%;
+            filter: blur(150px);
+            opacity: 0.5;
+            animation: flow 2s infinite alternate ease-in-out;
+            z-index: 0;
+        }
+
+        #blob1 {
+            background: radial-gradient(circle, rgba(255, 0, 255, 0.7) 0%, rgba(13, 13, 29, 0) 70%);
+            top: -200px;
+            left: -200px;
+        }
+
+        #blob2 {
+            background: radial-gradient(circle, rgba(0, 255, 255, 0.7) 0%, rgba(13, 13, 29, 0) 70%);
+            bottom: -250px;
+            right: -250px;
+            animation-delay: -1s;
+        }
+
+        .content {
+            position: relative;
+            z-index: 10;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="blob1" class="gradient-blob"></div>
+    <div id="blob2" class="gradient-blob"></div>
+
+    <div class="content min-h-screen flex flex-col items-center justify-center p-4">
+        <div class="max-w-4xl w-full bg-white/5 backdrop-blur-md border border-white/10 rounded-xl shadow-2xl p-8 md:p-12 text-center transition duration-500 hover:shadow-cyan-500/30">
+            <h1 class="text-6xl md:text-8xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-magenta-500 mb-4">LM Ship</h1>
+            <p class="text-xl md:text-2xl text-gray-300 mb-8">我们的 LM 深邃、流动、且无边无际</p>
+            <a href="LM/index.html" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-full text-white bg-gradient-to-r from-magenta-500 to-cyan-500 hover:from-magenta-600 hover:to-cyan-600 shadow-lg shadow-magenta-500/40 transition duration-300 transform hover:scale-105">探索 LM</a>
+        </div>
+    </div>
+</body>
+
+</html>
